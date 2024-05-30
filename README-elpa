@@ -18,7 +18,15 @@
   • Stays out of your way.  Set up once, then forget it exists.
   • Works with documents written in multiple languages.
 
-  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+  *News:*
+  • [2022-04-08 Fri] Added support for displaying current language as
+    color emoji in the mode line (requires Emacs 28.1 or later).  See
+    updated format of `guess-language-langcodes'.  Old configurations
+    should still work but won’t show color flags.
+
+
+2 What is guess-language?
+═════════════════════════
 
   I write a lot of text in multiple languages and was getting tired of
   constantly having to switch the dictionary of my spell-checker.  In
@@ -34,16 +42,34 @@
   detection of the language (~ 35 characters).
 
   Currently, the following languages are supported: Arabic, Czech,
-  Danish, Dutch, English, Finnish, French, German, Italian, Norwegian,
-  Polish, Portuguese, Russian, Slovak, Slovenian, Spanish, Swedish.  It
-  is very easy to add more languages and this repository includes the
-  necessary language statistics for 49 additional languages.  (These
-  were copied from [guess_language.py].)
+  Danish, Dutch, English, Esperanto, Finnish, French, German, Italian,
+  Norwegian, Polish, Portuguese, Russian, Serbian (Cyrillic and Latin),
+  Slovak, Slovenian, Spanish, Swedish, Vietnamese.
+
+  It is easy to add more languages and this repository includes the
+  necessary language statistics for 47 additional languages.  (These
+  were copied from [guess_language.py].)  If we already have the
+  required language data (see directory [trigrams]), all you need to do
+  is to add an entry to the variable `guess-language-langcodes'.  See
+  [here] for the commit that added support for Serbian.  See the code of
+  [typo-mode] to determine the quoting style needed for the language
+  that you’re adding.  An overview of quoting styles across languages
+  can be found on [Wikipedia].  PRs adding new languages are welcome.
 
 
 [guess_language.py] <https://github.com/kent37/guess-language>
 
-1.1 Prerequisites
+[trigrams]
+<https://github.com/tmalsburg/guess-language.el/tree/master/trigrams>
+
+[here]
+<https://github.com/tmalsburg/guess-language.el/commit/bbafdeaf380c41e4546510df7c257b898b702d65>
+
+[typo-mode] <https://github.com/jorgenschaefer/typoel>
+
+[Wikipedia] <https://en.wikipedia.org/wiki/Quotation_mark>
+
+2.1 Prerequisites
 ─────────────────
 
   This mode assumes that Flyspell is activated and configured for all
@@ -55,7 +81,7 @@
 [typo-mode] <https://github.com/jorgenschaefer/typoel>
 
 
-1.2 Installation
+2.2 Installation
 ────────────────
 
   Guess-language-mode is available through [MELPA].
@@ -64,10 +90,10 @@
 [MELPA] <https://melpa.org/#/guess-language>
 
 
-1.3 Configuration
+2.3 Configuration
 ─────────────────
 
-1.3.1 Language settings
+2.3.1 Language settings
 ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
 
   ┌────
@@ -112,17 +138,21 @@
 
   ┌────
   │ (setq guess-language-langcodes
-  │   '((en . ("en_GB" "English"))
-  │     (de . ("de_CH" "German"))))
+  │   '((en . ("en_GB" "English" "🇬🇧" "English"))
+  │     (de . ("de_CH" "German" "🇨🇭" "Swiss German"))))
   └────
 
-  The key of each entry in this alist is an ISO 639-1 language code.
-  The first element of the value is the name of the dictionary that
-  should be used (i.e., what you would enter when setting the language
-  via `M-x ispell-change-dictionary').  The second element is the name
-  of the language setting that should be used with typo-mode (if
-  present).  If a language is not supported by typo-mode or if you are
-  not using typo-mode, enter `nil'.
+  The key is a symbol specifying the ISO 639-1 code of the language.
+  The values is a list with four elements.  The first is the name of the
+  dictionary that should be used by the spell-checker (e.g., what you
+  would enter when setting the language with
+  `ispell-change-dictionary').  The second element is the name of the
+  language setting that should be used with typo-mode.  If a language is
+  not supported by typo-mode, that value is `nil'.  The third element is
+  a string for displaying the current language in the mode line.  This
+  could be text or a Unicode flag symbol (displayed as color emoji
+  starting from Emacs 28.1).  The last element is the name of the
+  language for display in the mini buffer.
 
   For a list of all dictionaries available for spell-checking, use the
   following:
@@ -133,30 +163,34 @@
 
   Languages that are currently supported by guess-language-mode:
 
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   Language    IDO 639-1 code  Default Ispell dictionary  Default typo-mode setting 
-  ──────────────────────────────────────────────────────────────────────────────────
-   Arabic      `ar'            ar                                                   
-   Czech       `cs'            czech                      Czech                     
-   Danish      `da'            dansk                                                
-   Dutch       `nl'            nederlands                                           
-   English     `en'            en                         English                   
-   Finnish     `fi'            finnish                    Finnish                   
-   French      `fr'            francais                   French                    
-   German      `de'            de                         German                    
-   Italian     `it'            italiano                   Italian                   
-   Norwegian   `nb'            norsk                                                
-   Polish      `pl'            polish                                               
-   Portuguese  `pt'            portuguese                                           
-   Russian     `ru'            russian                    Russian                   
-   Slovak      `sk'            slovak                                               
-   Slovenian   `sl'            slovenian                                            
-   Spanish     `es'            spanish                                              
-   Swedish     `sv'            svenska                                              
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   Language            IDO 639-1 code  Default Ispell dictionary  Default typo-mode setting        
+  ─────────────────────────────────────────────────────────────────────────────────────────────────
+   Arabic              `ar'            ar                                                          
+   Czech               `cs'            czech                      Czech                            
+   Danish              `da'            dansk                                                       
+   Dutch               `nl'            nederlands                                                  
+   English             `en'            en                         English                          
+   Esperanto           `eo'            esperanto                  English                          
+   Finnish             `fi'            finnish                    Finnish                          
+   French              `fr'            francais                   French                           
+   German              `de'            de                         German                           
+   Italian             `it'            italiano                   Italian                          
+   Norwegian           `nb'            norsk                                                       
+   Polish              `pl'            polish                                                      
+   Portuguese          `pt'            portuguese                                                  
+   Russian             `ru'            russian                    Russian                          
+   Serbian (Cyrillic)  `sr'            serbian                    German (most similar to Serbian) 
+   Serbian (Latin)     `sr'            sr-lat                     German (most similar to Serbian) 
+   Slovak              `sk'            slovak                                                      
+   Slovenian           `sl'            slovenian                                                   
+   Spanish             `es'            spanish                                                     
+   Swedish             `sv'            svenska                                                     
+   Vietnamese          `vi'            viet                                                        
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 
-1.3.2 Custom functions to be run when a new language is detected
+2.3.2 Custom functions to be run when a new language is detected
 ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
 
   While changing the spell-checker’s dictionary is the main purpose of
@@ -183,7 +217,7 @@
   └────
 
 
-1.4 Usage
+2.4 Usage
 ─────────
 
   Activate `guess-language-mode' in the buffer in which you want to use
@@ -195,7 +229,7 @@
   └────
 
 
-1.4.1 Changing the voice used by the Festival text-to-speech system
+2.4.1 Changing the voice used by the Festival text-to-speech system
 ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
 
   The code snipped below illustrates how guess-language can be
@@ -219,10 +253,48 @@
   │ (add-hook 'guess-language-after-detection-functions #'guess-language-switch-festival-function)
   └────
 
-  The `pcase' needs to be modified to use the voiced that are installed
+  The `pcase' needs to be modified to use the voices that are installed
   on your system.  Refer to the documentation of Festival for details.
 
 
 [Festival] <http://www.cstr.ed.ac.uk/projects/festival/>
 
 [festival.el] <https://www.emacswiki.org/emacs/festival.el>
+
+
+2.4.2 Changing the language of Synosaurus
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+
+  [Synosaurus] is an Emacs package providing access to a German or
+  English thesaurus.  Using the code below the language of the thesaurus
+  is automatically changed to the language of the current paragraph.
+  Refer to the documentation of Synosaurus for details.
+
+  ┌────
+  │ (defun guess-language-switch-synosaurus (lang beginning end)
+  │   "Switch the thesaurus language.
+  │ 
+  │ LANG is the ISO 639-1 code of the language (as a
+  │ symbol).  BEGINNING and END are the endpoints of the region in
+  │ which LANG was detected.  These are ignored."
+  │   (when (featurep 'synosaurus)
+  │     (pcase lang
+  │       ('en (setq synosaurus-backend 'synosaurus-backend-wordnet))
+  │       ('de (setq synosaurus-backend 'synosaurus-backend-openthesaurus)))))
+  │ 
+  │ (add-hook 'guess-language-after-detection-functions #'guess-language-switch-synosaurus)
+  └────
+
+
+[Synosaurus] <https://github.com/hpdeifel/synosaurus>
+
+
+2.5 Notes
+─────────
+
+  • Support for Latin Serbian is based on trigrams transliterated from
+    Cyrillic Serbian.  Since some Cyrillic trigrams transliterate to
+    4-grams in Latin, we truncated those but as a result have two
+    duplicates, "e n" and "ra ".  Not ideal but the results are probably
+    still robust enough.  Nonetheless, it would be good if someone could
+    compute proper Latin trigrams one day.
